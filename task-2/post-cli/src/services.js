@@ -93,14 +93,11 @@ const createUser = async (name, password) => {
     },
     body: JSON.stringify({ name, password }),
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(
-      error.message ||
-        "Could not retrieve user profile, try choosing a different username",
-    );
+    throw new Error(data.message || "Could not register user");
   }
-  return await response.json();
+  return data;
 };
 
 /**
@@ -117,11 +114,11 @@ const loginUser = async (name, password) => {
     },
     body: JSON.stringify({ name, password }),
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || "Could not log in");
+    throw new Error(data.message || "Could not log in");
   }
-  return await response.json();
+  return data;
 };
 
 // ============================================================================

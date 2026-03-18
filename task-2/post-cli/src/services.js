@@ -34,13 +34,18 @@ const getToken = () => authToken;
  * Response: { id: number, user: string, text: string, timestamp: string }
  */
 const getHello = async () => {
-  const response = await fetch(`${BASE_URL}/posts/hello`);
+  const response = await fetch(`${BASE_URL}/posts/hello`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
-      `Failed to get hello: HTTP ${response.status} ${response.statusText}`,
-    );
+    throw new Error(data.message || `Failed to get hello: ${response.status}`);
   }
-  return await response.json();
+
+  return data;
 };
 
 // ============================================================================
@@ -60,12 +65,14 @@ const getMe = async () => {
       Authorization: `Bearer ${getToken()}`,
     },
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(
-      `Failed to get user info: HTTP ${response.status} ${response.statusText}`,
+      data.message || `Failed to get user info: ${response.status}`,
     );
   }
-  return await response.json();
+
+  return data;
 };
 
 // ============================================================================
@@ -87,8 +94,10 @@ const createUser = async (name, password) => {
     body: JSON.stringify({ name, password }),
   });
   if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
     throw new Error(
-      `Failed to create user: HTTP ${response.status} ${response.statusText}`,
+      error.message ||
+        "Could not retrieve user profile, try choosing a different username",
     );
   }
   return await response.json();
@@ -109,9 +118,8 @@ const loginUser = async (name, password) => {
     body: JSON.stringify({ name, password }),
   });
   if (!response.ok) {
-    throw new Error(
-      `Failed to log in: HTTP ${response.status} ${response.statusText}`,
-    );
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Could not log in");
   }
   return await response.json();
 };
@@ -135,12 +143,11 @@ const createPost = async (text) => {
     },
     body: JSON.stringify({ text }),
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
-      `Failed to create post: HTTP ${response.status} ${response.statusText}`,
-    );
+    throw new Error(data.message || "Could not create post");
   }
-  return await response.json();
+  return data;
 };
 
 /**
@@ -156,12 +163,11 @@ const getPosts = async () => {
       Authorization: `Bearer ${getToken()}`,
     },
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
-      `Failed to get posts: HTTP ${response.status} ${response.statusText}`,
-    );
+    throw new Error(data.message || "Could not retrieve posts");
   }
-  return await response.json();
+  return data;
 };
 
 /**
@@ -179,12 +185,11 @@ const updatePost = async (id, text) => {
     },
     body: JSON.stringify({ text }),
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
-      `Failed to update post: HTTP ${response.status} ${response.statusText}`,
-    );
+    throw new Error(data.message || "Could not update post");
   }
-  return await response.json();
+  return data;
 };
 
 /**
@@ -200,12 +205,11 @@ const deleteUser = async () => {
       Authorization: `Bearer ${getToken()}`,
     },
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
-      `Failed to delete user: HTTP ${response.status} ${response.statusText}`,
-    );
+    throw new Error(data.message || "Could not delete user");
   }
-  return await response.json();
+  return data;
 };
 
 /**
@@ -221,12 +225,11 @@ const deletePost = async (id) => {
       Authorization: `Bearer ${getToken()}`,
     },
   });
+  const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(
-      `Failed to delete post: HTTP ${response.status} ${response.statusText}`,
-    );
+    throw new Error(data.message || "Could not delete post");
   }
-  return await response.json();
+  return data;
 };
 
 // ============================================================================
